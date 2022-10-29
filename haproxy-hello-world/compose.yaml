@@ -18,7 +18,7 @@ services:
     sysctls:
       net.ipv4.ip_unprivileged_port_start: "0"
   uno:
-    hostname: Huey and the News
+    hostname: Huey
     container_name: Huey
     image: flask-hello-world
     networks:
