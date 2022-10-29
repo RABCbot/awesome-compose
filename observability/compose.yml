@@ -1,0 +1,81 @@
+networks:
+  internal-network:
+    name: observe-network
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: observe-prometheus
+    hostname: observe-prometheus
+    ports:
+      - 9090:9090
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    user: "1000:1000"
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - ./prometheus/data:/prometheus
+    networks:
+      - internal-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: observe-grafana
+    hostname: observe-grafana
+    ports:
+      - 3000:3000
+    user: "1000:1000"
+    environment:
+      - GF_INSTALL_PLUGINS=ayoungprogrammer-finance-datasource
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana:/etc/grafana/provisioning/datasources
+    networks:
+      - internal-network
+
+  loki:
+    image: grafana/loki
+    container_name: observe-loki
+    hostname: observe-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/config.yml
+    volumes:
+      - ./loki:/etc/loki
+    networks:
+      - internal-network
+
+  promtail:
+    image: grafana/promtail
+    container_name: observe-promtail
+    hostname: observe-promtail
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail:/etc/promtail
+      - /var/log:/var/log
+    networks:
+      - internal-network
+
+#  alertmanager:
+#    image: prom/alertmanager:v0.21.0
+#    ports:
+#      - 9093:9093
+#    networks:
+#      - imagine_poc
+#    volumes:
+#      - ./alertmanager:/etc/alertmanager
+#    command:
+#      - "--config.file=/etc/alertmanager/alertmanager.yml"
+#      - "--storage.path=/alertmanager"
+#    deploy:
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.role == manager
