@@ -2,6 +2,11 @@ networks:
   internal-network:
     name: observe-network
 
+volumes:
+  grafana-volume:
+    name: observe-volume
+
+
 services:
   prometheus:
     image: prom/prometheus
@@ -16,10 +21,9 @@ services:
       - "--web.console.templates=/etc/prometheus/consoles"
       - "--storage.tsdb.retention.time=200h"
       - "--web.enable-lifecycle"
-    user: "1000:1000"
     volumes:
       - ./prometheus:/etc/prometheus
-      - ./prometheus/data:/prometheus
+      - observer-volume:/prometheus
     networks:
       - internal-network
 
@@ -29,13 +33,12 @@ services:
     hostname: observe-grafana
     ports:
       - 3000:3000
-    user: "1000:1000"
     environment:
       - GF_INSTALL_PLUGINS=ayoungprogrammer-finance-datasource
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=grafana
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - observer-volume:/var/lib/grafana
       - ./grafana:/etc/grafana/provisioning/datasources
     networks:
       - internal-network
