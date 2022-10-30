@@ -7,13 +7,10 @@ Project structure:
 ├── compose.yaml
 ├── grafana
 │   └── datasource.yml
-│   └── data/
 ├── prometheus
 │   └── prometheus.yml
-│   └── data/
 ├── loki
 │   └── config.yml
-│   └── data/
 ├── promtail
 │   └── config.yml
 └── README.md
