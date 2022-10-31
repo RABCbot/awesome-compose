@@ -33,7 +33,6 @@ services:
     ports:
       - 3000:3000
     environment:
-      - GF_INSTALL_PLUGINS=ayoungprogrammer-finance-datasource
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=grafana
     volumes:
